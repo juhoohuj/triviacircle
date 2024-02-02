@@ -1,7 +1,7 @@
 import useState from 'react';
+import Playerlist from './components/Playerlist'
 
 const Gametable = () => {
-
   const testUser = {
     name: 'Test User',
     score: 0,
@@ -16,7 +16,6 @@ const Gametable = () => {
     //answerPos : 0
   }
 
-
   const [players, setPlayers] = useState([testUser, testUser2])
 
   const addPlayer = (player) => {
@@ -27,7 +26,7 @@ const Gametable = () => {
     <div>
       <h1>Game Table</h1>
       <PlayerForm addPlayer={addPlayer} />
-      <PlayerList players={players} />
+      <Playerlist players={players} />
     </div>
   )
 
