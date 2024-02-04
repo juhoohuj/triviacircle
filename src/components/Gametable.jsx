@@ -7,7 +7,7 @@ const Gametable = () => {
     name: 'Test User',
     score: 0,
     active : true,
-    //answerPos : 0
+    answerQue : 1
   }
 
   const testUser2 = {
@@ -15,7 +15,7 @@ const Gametable = () => {
     name: 'Test User 2',
     score: 4,
     active : true,
-    //answerPos : 0
+    answerQue : 2
   }
 
   const [players, setPlayers] = useState([testUser, testUser2])
@@ -23,6 +23,20 @@ const Gametable = () => {
   const addPlayer = (player) => {
     setPlayers([...players, player])
   }
+
+  function changeQue() {
+    let newPlayers = players.map((player) => {
+      if (player.active) {
+        player.answerQue = player.answerQue - 1
+      }
+      if(player.answerQue === 0){
+        player.answerQue = players.length
+      }
+      return player
+    })
+    setPlayers(newPlayers)
+  }
+
 
   return (
     <div>
