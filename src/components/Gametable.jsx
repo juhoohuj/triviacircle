@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Playerlist from './Playerlist';
+import questions from '../../content/questions';
 
 const Gametable = () => {
   const testUser = {
@@ -42,6 +43,9 @@ const Gametable = () => {
     <div>
       <h1>Game Table</h1>
       <Playerlist players={players} />
+      <p>Question: </p>
+      <button onClick={changeQue}>Change Question</button>
+
     </div>
   )
 
