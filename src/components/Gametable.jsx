@@ -43,7 +43,7 @@ const Gametable = () => {
     <div>
       <h1>Game Table</h1>
       <Playerlist players={players} />
-      <p>Question: </p>
+      <p>Question: {questions}</p>
       <button onClick={changeQue}>Change Question</button>
 
     </div>
