@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Playerlist from './Playerlist';
+import questions from '../../content/questions';
 
 
 //pelipöytä
@@ -44,6 +45,9 @@ const Gametable = () => {
     <div>
       <h1>Game Table</h1>
       <Playerlist players={players} />
+      <p>Question: {questions}</p>
+      <button onClick={changeQue}>Change Question</button>
+
     </div>
   )
 
