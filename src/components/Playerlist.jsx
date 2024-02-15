@@ -1,4 +1,6 @@
 
+
+//pelaajien haku ja listaus
 const Playerlist = ({ players }) => {
   return (
     <div>

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Playerlist from './Playerlist';
 import questions from '../../content/questions';
 
+
+//pelipöytä
 const Gametable = () => {
   const testUser = {
     id: 1,
