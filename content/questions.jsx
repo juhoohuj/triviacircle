@@ -1,6 +1,4 @@
 
-
-
 const questions = [
   {
     question: "Is a programming language",

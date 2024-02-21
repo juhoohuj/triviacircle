@@ -5,9 +5,12 @@ function App() {
 
 
   return (
-    <>
-      <Gametable />
-    </>
+    <div className="App">
+      <header className="App-header">
+        <h1>Quiz Game</h1>
+        <Gametable />
+      </header>
+    </div>
   )
 }
 
