@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Playerlist from "./Playerlist";
 import questions from "../../content/questions";
+import { ButtonGroup } from "@mui/material";
 
 //pelipöytä
 const Gametable = () => {
@@ -30,17 +31,27 @@ const Gametable = () => {
   };
 
   function checkAnswer(answer) {
+    if (answer.includes(correct)){
+      console.log("Correct answer");
+      changeQue();
+    } else {
+      console.log("Wrong answer");
+      changeQue();
+    }
+  }
+
+  //funktio joka vaihtaa pelaajien vuoroa
+  function changeQue() {
     let newPlayers = players.map((player) => {
       if (player.active) {
-        if (correct.includes(answer)) {
-          player.score = player.score + 1;
-        }
-        player.active = false;
+        player.answerQue = player.answerQue - 1;
+      }
+      if (player.answerQue === 0) {
+        player.answerQue = players.length;
       }
       return player;
     });
     setPlayers(newPlayers);
-    changeQue();
   }
 
   const shuffleAnswers = (correct, incorrect) => {
@@ -70,7 +81,9 @@ const Gametable = () => {
       <p>Answers: </p>
       <ul>
         {shuffleAnswers(correct, incorrect).map((answer, index) => (
-          <button key={index} onClick={() => checkAnswer}>{answer}</button>
+          <ButtonGroup key={index} variant="contained" color="primary">
+            <button onClick={() => checkAnswer(answer)}>{answer}</button>
+          </ButtonGroup>
         ))}
       </ul>
     </div>
