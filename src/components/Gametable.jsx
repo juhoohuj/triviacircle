@@ -17,9 +17,9 @@ const Gametable = () => {
   const testUser2 = {
     id: 2,
     name: "Test User 2",
-    totalScore: 4, // Corrected typo: 'totaolScore' -> 'totalScore'
+    totalScore: 4,
     roundScore: 0,
-    active: true,
+    active: false,
     answerQue: 2,
   };
 
@@ -48,33 +48,29 @@ const Gametable = () => {
       if (correct.includes(answer)) {
         console.log("Correct answer");
         player.roundScore = player.roundScore + 1;
-        console.log("Player round score: ", player.roundScore);
-        console.log("Player total score: ", player.totalScore);
       } else {
         console.log("Wrong answer");
         player.roundScore = 0;
         player.answerQue = null;
-        console.log("Player round score: ", player.roundScore);
-        console.log("Player total score: ", player.totalScore);
       }
       setDisabledButtons([...disabledButtons, index]); // Disable the button
+      changeQue();
     }
-    changeQue();
   }
 
-  // Function to change player turn
   function changeQue() {
     setPlayers((prevPlayers) => {
       return prevPlayers.map((player) => {
-        player.answerQue = player.answerQue - 1;
-        if (player.active) {
-          player.answerQue = players.length;
-          player.active = false;
+        const newPlayer = { ...player }; // Create a new player object to update
+        newPlayer.answerQue = player.answerQue - 1;
+        if (newPlayer.active) {
+          newPlayer.answerQue = players.length;
+          newPlayer.active = false;
         }
-        if (player.answerQue <= 0) {
-          player.active = true;
+        if (newPlayer.answerQue === 1) {
+          newPlayer.active = true;
         }
-        return player;
+        return newPlayer;
       });
     });
   }
