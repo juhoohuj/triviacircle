@@ -1,17 +1,14 @@
-import './App.css'
-import Gametable from './components/Gametable'
+import "./App.css";
+import Gametable from "./components/Gametable";
+import Home from "./components/Home";
 
 function App() {
-
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Quiz Game</h1>
-        <Gametable />
-      </header>
+    <div>
+      <Home />
+      <Gametable />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
