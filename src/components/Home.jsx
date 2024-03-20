@@ -1,36 +1,54 @@
-import roomService from "../services/rooms"
-import { useState } from "react"
-
+import roomService from "../services/rooms";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useHistory from react-router-dom
 
 const Home = () => {
-    const [roomCode, setRoomCode] = useState("")
-    const [username, setUsername] = useState("")
-    const [room, setRoom] = useState(null)
+  const [roomCode, setRoomCode] = useState("");
+  const [username, setUsername] = useState("");
+  const [room, setRoom] = useState(null);
+  const navigateTo = useNavigate(); // Initialize useHistory
 
-    const handleJoinRoom = async () => {
-        const room = await roomService.joinRoom(roomCode, username)
-        setRoom(room)
+  const handleJoinRoom = async () => {
+    const room = await roomService.joinRoom(roomCode, username);
+    if (room) {
+      setRoom(room);
+      console.log("Room found: ", room);
+      // Navigate to the room URL when room is found
+      navigateTo(`/room/${roomCode}`);
     }
+  };
 
-    return (
-        <div>
-            <h1>Welcome to the Home Page</h1>
-            <p>Enter your name: </p>
-            <input type="text" placeholder="Name..." onChange={(e) => setUsername(e.target.value)} />
+  return (
+    <div>
+      <h1>Welcome to the Home Page</h1>
+      <p>Enter your name: </p>
+      <input
+        type="text"
+        placeholder="Name..."
+        onChange={(e) => setUsername(e.target.value)}
+      />
 
-            <p>Join to an existing game: </p>
-            <input type="text" placeholder="Room Code..." onChange={(e) => setRoomCode(e.target.value)} />
-            <button onClick={handleJoinRoom}>Join Game</button>
+      <p>Join to an existing game: </p>
+      <input
+        type="text"
+        placeholder="Room Code..."
+        onChange={(e) => setRoomCode(e.target.value)}
+      />
+      <button onClick={handleJoinRoom}>Join Game</button>
 
-            <p>Create a new game: </p>
-            <button onClick={async () => {
-                const room = await roomService.createRoom(username)
-                setRoom(room)
-            }}>Create Game</button>
+      <p>Create a new game: </p>
+      <button
+        onClick={async () => {
+          const room = await roomService.createRoom(username);
+          setRoom(room);
+          // Navigate to the room URL when room is created
+          navigateTo(`/room/${room.id}`);
+        }}
+      >
+        Create Game
+      </button>
+    </div>
+  );
+};
 
-        </div>
-    )
-}
-
-export default Home
-
+export default Home;
