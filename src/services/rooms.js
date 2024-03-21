@@ -1,39 +1,37 @@
-import axios from 'axios';
-const baseUrl = 'http://localhost:3000'; // Add http:// protocol specifier
+import io from "socket.io-client";
 
-const joinRoom = async (roomId, username) => {
-  try {
-    const response = await axios.post(`${baseUrl}/joinroom`, {
-      roomId,
-      username,
-    });
-    return response.data;
-  } catch (error) {
-    // Handle error
-    console.error('There was an error!', error);
-    throw error; // Rethrow error for caller to handle if necessary
-  }
-}
+const socket = io(); // Establish a connection with the Socket.IO server
 
-const getOne = async id => {
-  const response = await axios.get(`${baseUrl}/${id}`)
-  return response.data
-}
+const joinRoom = (roomId, username) => {
+  // Emit the joinRoom event when the roomId and username are available
+  socket.emit("joinRoom", { roomId, username });
+};
 
-const createRoom = async (username) => {
-  const response = await axios.post(`${baseUrl}/createroom`, {
-    username,
-  });
-  return response.data;
-}
+const leaveRoom = (roomId, username) => {
+  // Emit the leaveRoom event to the server
+  socket.emit("leaveRoom", { roomId, username });
+};
 
-const getRoom = async (roomCode) => {
-  const response = await axios.get(`/getroom?roomCode=${roomCode}`);
-  return response.data;
-}
+const sendMessage = (roomId, username, message) => {
+  // Emit the chatMessage event to the server
+  socket.emit("chatMessage", { roomId, username, message });
+  console.log("Chat message sent");
+};
+
+const listenForMessages = (callback) => {
+  // Listen for incoming messages from the server and invoke the callback
+  socket.on("message", callback);
+};
+
+const disconnectSocket = () => {
+  // Close the socket connection
+  socket.close();
+};
 
 export default {
   joinRoom,
-  createRoom,
-  getRoom,
+  leaveRoom,
+  sendMessage,
+  listenForMessages,
+  disconnectSocket,
 };
