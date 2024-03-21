@@ -1,46 +1,32 @@
-// ChatComponent.jsx
 import React, { useState, useEffect } from "react";
-import io from "socket.io-client";
-import roomService from "../services/rooms"; // Import your room service
+import roomService from "../services/rooms";
 
 const ChatComponent = ({ roomId, username }) => {
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
-  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    // Establish a connection with the Socket.IO server
-    const newSocket = io();
-    setSocket(newSocket);
+    // Join the room when the component mounts
+    roomService.joinRoom(roomId, username);
 
-    // Clean up the socket connection when the component unmounts
-    return () => newSocket.close();
+    // Clean up the room when the component unmounts
+    return () => {
+      roomService.leaveRoom(roomId, username);
+      roomService.disconnectSocket(); // Optionally close the socket connection
+    };
+  }, [roomId, username]);
+
+  useEffect(() => {
+    // Listen for incoming messages from the server and update the state
+    roomService.listenForMessages((message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
   }, []);
 
-  useEffect(() => {
-    if (socket) {
-      // Emit the joinRoom event when the roomId and username are available
-      socket.emit("joinRoom", { roomId, username });
-
-      // Listen for incoming messages from the server and update the state
-      socket.on("message", (message) => {
-        setMessages((prevMessages) => [...prevMessages, message]);
-      });
-    }
-
-    // Clean up the room when the component unmounts or the roomId/username changes
-    return () => {
-      if (socket) {
-        socket.emit("leaveRoom", { roomId, username });
-      }
-    };
-  }, [socket, roomId, username]);
-
-  // Function to handle sending messages
   const handleMessageSend = () => {
     if (messageInput.trim() === "") return;
-    // Emit the chatMessage event to the server
-    socket.emit("chatMessage", { roomId, username, message: messageInput });
+    // Send chat message to the server
+    roomService.sendMessage(roomId, username, messageInput);
     setMessageInput("");
   };
 

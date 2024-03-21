@@ -1,30 +1,30 @@
 import roomService from "../services/rooms";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useHistory from react-router-dom
+import { useNavigate } from "react-router-dom";
 import RoomView from "./RoomView";
 
 const Home = () => {
   const [roomCode, setRoomCode] = useState("");
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState(null);
-  const navigateTo = useNavigate(); // Initialize useHistory
+  const navigateTo = useNavigate();
 
   const handleJoinRoom = async () => {
-    const room = await roomService.joinRoom(roomCode, username);
-    if (room) {
-      setRoom(room);
-      console.log("Room found: ", room);
-      // Navigate to the room URL when room is found
-      navigateTo(`/room/${roomCode}`);
-    }
+    // Call roomService.joinRoom which emits socket event to join the room
+    await roomService.joinRoom(roomCode, username);
+
+    setRoom({ id: roomCode, username });
+
+    // Navigate to the room URL
+    navigateTo(`/room/${roomCode}`);
   };
 
   const handleCreateRoom = async () => {
-    const room = await roomService.createRoom(username);
-    setRoom(room);
-    console.log("Room created: ", room);
-    // Navigate to the room URL when room is created
-    navigateTo(`/room/${room.id}`);
+    // Call roomService.createRoom which emits socket event to create a room
+    const newRoom = await roomService.createRoom(username);
+
+    // Navigate to the room URL
+    navigateTo(`/room/${newRoom.id}`);
   };
 
   return (
