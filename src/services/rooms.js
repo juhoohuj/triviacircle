@@ -12,6 +12,11 @@ const leaveRoom = (roomId, username) => {
   socket.emit("leaveRoom", { roomId, username });
 };
 
+const createRoom = (username) => {
+  // Emit the createRoom event to the server
+  socket.emit("createRoom", { username });
+};
+
 const sendMessage = (roomId, username, message) => {
   // Emit the chatMessage event to the server
   socket.emit("chatMessage", { roomId, username, message });
@@ -34,4 +39,5 @@ export default {
   sendMessage,
   listenForMessages,
   disconnectSocket,
+  createRoom,
 };

@@ -13,17 +13,21 @@ const Home = () => {
     // Call roomService.joinRoom which emits socket event to join the room
     await roomService.joinRoom(roomCode, username);
 
-    setRoom({ id: roomCode, username });
-
-    // Navigate to the room URL
-    navigateTo(`/room/${roomCode}`);
+    if (roomCode) {
+      setRoom({ id: roomCode, username });
+      // Navigate to the room URL
+      navigateTo(`/room/${roomCode}`);
+    }
+    if (!username) {
+      alert("Please enter a room code and username to join a room");
+    }
   };
 
   const handleCreateRoom = async () => {
     // Call roomService.createRoom which emits socket event to create a room
     const newRoom = await roomService.createRoom(username);
+    console.log(newRoom);
 
-    // Navigate to the room URL
     navigateTo(`/room/${newRoom.id}`);
   };
 
