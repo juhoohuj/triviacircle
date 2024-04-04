@@ -1,38 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import roomService from "../services/rooms";
 
 const ChatComponent = ({ roomId, username }) => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    { username: "Admin", text: "Welcome to the chat!" },
+    { username: "Admin", text: "Please be respectful!" },
+  ]);
   const [messageInput, setMessageInput] = useState("");
 
-  useEffect(() => {
-    // Join the room when the component mounts
-    roomService.joinRoom(roomId, username);
-
-    // Clean up the room when the component unmounts
-    return () => {
-      roomService.leaveRoom(roomId, username);
-      roomService.disconnectSocket(); // Optionally close the socket connection
-    };
-  }, [roomId, username]);
+  const isListenerRegistered = useRef(false);
 
   useEffect(() => {
-    // Listen for incoming messages from the server and update the state
-    roomService.listenForMessages((message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
+    // Register listener for incoming messages only once
+    if (!isListenerRegistered.current) {
+      roomService.listenForMessages((message) => {
+        setMessages((prevMessages) => [...prevMessages, message]);
+      });
+
+      // Update the ref to indicate that the listener has been registered
+      isListenerRegistered.current = true;
+    }
   }, []);
 
   const handleMessageSend = () => {
     if (messageInput.trim() === "") return;
     // Send chat message to the server
-    roomService.sendMessage(roomId, username, messageInput);
+    roomService.chatMessage(roomId, username, messageInput);
     setMessageInput("");
   };
 
   return (
     <div>
       <div>
+        <h2>Chat</h2>
         {messages.map((message, index) => (
           <div key={index}>
             <strong>{message.username}: </strong>

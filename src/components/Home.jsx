@@ -11,15 +11,14 @@ const Home = () => {
 
   const handleJoinRoom = async () => {
     // Call roomService.joinRoom which emits socket event to join the room
-    await roomService.joinRoom(roomCode, username);
+    const response = await roomService.joinRoom(roomCode, username);
+    console.log(response.roomId);
 
-    if (roomCode) {
-      setRoom({ id: roomCode, username });
-      // Navigate to the room URL
-      navigateTo(`/room/${roomCode}`);
-    }
-    if (!username) {
-      alert("Please enter a room code and username to join a room");
+    setRoom(response);
+    navigateTo(`/room/${response.roomId}`);
+    if (response.error) {
+      console.log(response.error);
+      return;
     }
   };
 
@@ -55,7 +54,7 @@ const Home = () => {
           <button onClick={handleCreateRoom}>Create Game</button>
         </div>
       ) : (
-        <RoomView room={room} />
+        <RoomView room={room} username={username} />
       )}
     </div>
   );
