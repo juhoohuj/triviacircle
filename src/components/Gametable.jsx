@@ -23,6 +23,10 @@ const Gametable = () => {
     answerQue: 2,
   };
 
+  //make player object for the current player
+
+
+
   const [players, setPlayers] = useState([testUser, testUser2]);
   const [question, setQuestion] = useState(questions[0].question);
   const [correct, setCorrect] = useState(questions[0].correct);

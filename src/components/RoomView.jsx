@@ -1,6 +1,7 @@
 // RoomView.jsx
 import React from "react";
 import ChatComponent from "./ChatComponent";
+import Gametable from "./Gametable";
 
 const RoomView = ({ room, username }) => {
   return (
@@ -8,6 +9,7 @@ const RoomView = ({ room, username }) => {
       <h1>Room: {room.roomId}</h1>
       <h2>Username: {username}</h2>
       <ChatComponent roomId={room.roomId} username={username} />
+      <Gametable roomId={room.roomId} username={username} />
     </div>
   );
 };
