@@ -62,6 +62,9 @@ const Gametable = () => {
     }
   }
 
+  
+
+
   function changeQue() {
     setPlayers((prevPlayers) => {
       return prevPlayers.map((player) => {

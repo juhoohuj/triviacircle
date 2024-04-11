@@ -1,31 +1,15 @@
-import axios from "axios";
-import io from "socket.io-client";
 
-const socket = io("http://localhost:3000"); // Establish a connection with the Socket.IO server
-const baseUrl = "http://localhost:3000";
 
-const joinRoom = async (roomId, username) => {
+
+{/*const joinRoom = async (roomId, username) => {
   // Emit the joinRoom event to the server
   socket.emit("joinRoom", { roomId, username });
-
-  try {
-    const response = await axios.post(`${baseUrl}/joinroom`, {
-      roomId,
-      username,
-    });
-    return response.data;
-  } catch (error) {
-    // Handle error
-    console.error("There was an error!", error);
-    throw error; // Rethrow error for caller to handle if necessary
-  }
-
 };
 
 const leaveRoom = (roomId, username) => {
   // Emit the leaveRoom event to the server
   socket.emit("leaveRoom", { roomId, username });
-};
+};*/}
 
 const createRoom = (username) => {
   // Emit the createRoom event to the server
@@ -48,11 +32,21 @@ const disconnectSocket = () => {
   socket.close();
 };
 
+const listenForRoomDetails = (callback) => {
+  // Listen for roomDetails event and invoke the callback
+  socket.on("roomDetails", callback);
+};
+
+const unsubscribeFromRoomDetails = () => {
+  // Stop listening for roomDetails event
+  socket.off("roomDetails");
+};
+
 export default {
-  joinRoom,
-  leaveRoom,
   chatMessage,
   listenForMessages,
   disconnectSocket,
   createRoom,
+  listenForRoomDetails,
+  unsubscribeFromRoomDetails,
 };

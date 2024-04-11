@@ -1,33 +1,39 @@
-import roomService from "../services/rooms";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RoomView from "./RoomView";
+import socket from "../socket";
 
 const Home = () => {
+  console.log("Home component rendering");
   const [roomCode, setRoomCode] = useState("");
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState(null);
   const navigateTo = useNavigate();
 
-  const handleJoinRoom = async () => {
-    // Call roomService.joinRoom which emits socket event to join the room
-    const response = await roomService.joinRoom(roomCode, username);
-    console.log(response.roomId);
+  console.log("attempting to connect to server");
 
-    setRoom(response);
-    navigateTo(`/room/${response.roomId}`);
-    if (response.error) {
-      console.log(response.error);
-      return;
-    }
-  };
+  socket.on("connect", () => {
+    console.log(`Connected to server with socket ID: ${socket.id}`);
+  });
 
-  const handleCreateRoom = async () => {
-    // Call roomService.createRoom which emits socket event to create a room
-    const newRoom = await roomService.createRoom(username);
-    console.log(newRoom);
+  socket.on("connect_error", (err) => {
+    console.error("Connection Error:", err.message);
+  });
 
-    navigateTo(`/room/${newRoom.id}`);
+  const handleCreateRoom = () => {
+    // Emit event to create a room
+    socket.emit("createRoom", { username });
+
+    // Listen for a response from the server
+    socket.once("createRoomSuccess", (newRoom) => {
+      console.log(newRoom.id);
+      navigateTo(`/room/${newRoom.id}`);
+    });
+
+    // Optional: Listen for an error event
+    socket.once("createRoomError", (error) => {
+      console.log(error);
+    });
   };
 
   return (

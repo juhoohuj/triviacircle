@@ -8,27 +8,18 @@ const ChatComponent = ({ roomId, username }) => {
   ]);
   const [messageInput, setMessageInput] = useState("");
 
-  const isListenerRegistered = useRef(false);
+  const [roomDetails, setRoomDetails] = useState(null);
+  const roomDetailsRef = useRef(roomDetails);
 
-  useEffect(() => {
-    // Register listener for incoming messages only once
-    if (!isListenerRegistered.current) {
-      roomService.listenForMessages((message) => {
-        setMessages((prevMessages) => [...prevMessages, message]);
-      });
-
-      // Update the ref to indicate that the listener has been registered
-      isListenerRegistered.current = true;
-    }
-  }, []);
 
   const handleMessageSend = () => {
-    if (messageInput.trim() === "") return;
-    // Send chat message to the server
-    roomService.chatMessage(roomId, username, messageInput);
-    setMessageInput("");
-  };
+    if (messageInput) {
+      roomService.chatMessage(roomId, username, messageInput);
+      setMessageInput("");
+    }
+  }
 
+  
   return (
     <div>
       <div>
@@ -39,6 +30,18 @@ const ChatComponent = ({ roomId, username }) => {
             {message.text}
           </div>
         ))}
+      </div>
+      <div>
+        <h2>Room Details</h2>
+        {roomDetails ? (
+          <div>
+            <p>Room ID: {roomDetails.roomId}</p>
+            <p>Users:</p>
+            <ul></ul>
+          </div>
+        ) : (
+          <p>Loading room details...</p>
+        )}
       </div>
       <input
         type="text"
