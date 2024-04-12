@@ -1,50 +1,73 @@
+import socket from "../socket";
 
-
-
-{/*const joinRoom = async (roomId, username) => {
-  // Emit the joinRoom event to the server
+const joinRoom = (roomId, username, callbacks) => {
   socket.emit("joinRoom", { roomId, username });
+
+  socket.on("joinRoomSuccess", (room) => {
+    callbacks.onSuccess(room);
+    // Clean up listeners after successful operation
+    socket.off("joinRoomSuccess");
+    socket.off("joinRoomError");
+  });
+
+  socket.on("joinRoomError", (error) => {
+    callbacks.onError(error);
+    // Clean up listeners after error
+    socket.off("joinRoomSuccess");
+    socket.off("joinRoomError");
+  });
 };
 
 const leaveRoom = (roomId, username) => {
-  // Emit the leaveRoom event to the server
   socket.emit("leaveRoom", { roomId, username });
-};*/}
+};
 
-const createRoom = (username) => {
-  // Emit the createRoom event to the server
+const createRoom = (username, callbacks) => {
   socket.emit("createRoom", { username });
+
+  socket.on("createRoomSuccess", (room) => {
+    callbacks.onSuccess(room);
+    socket.off("createRoomSuccess");
+    socket.off("createRoomError");
+  });
+
+  socket.on("createRoomError", (error) => {
+    callbacks.onError(error);
+    socket.off("createRoomSuccess");
+    socket.off("createRoomError");
+  });
 };
 
 const chatMessage = (roomId, username, message) => {
-  // Emit the chatMessage event to the server
   socket.emit("chatMessage", { roomId, username, message });
-  console.log("Chat message sent");
 };
 
 const listenForMessages = (callback) => {
-  // Listen for incoming messages from the server and invoke the callback
   socket.on("message", callback);
 };
 
-const disconnectSocket = () => {
-  // Close the socket connection
-  socket.close();
+const unsubscribeFromMessages = () => {
+  socket.off("message");
 };
 
 const listenForRoomDetails = (callback) => {
-  // Listen for roomDetails event and invoke the callback
   socket.on("roomDetails", callback);
 };
 
 const unsubscribeFromRoomDetails = () => {
-  // Stop listening for roomDetails event
   socket.off("roomDetails");
 };
 
+const disconnectSocket = () => {
+  socket.close();
+};
+
 export default {
+  joinRoom,
+  leaveRoom,
   chatMessage,
   listenForMessages,
+  unsubscribeFromMessages,
   disconnectSocket,
   createRoom,
   listenForRoomDetails,

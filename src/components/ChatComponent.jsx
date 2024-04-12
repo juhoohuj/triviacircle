@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import roomService from "../services/rooms";
 
 const ChatComponent = ({ roomId, username }) => {
@@ -7,19 +7,35 @@ const ChatComponent = ({ roomId, username }) => {
     { username: "Admin", text: "Please be respectful!" },
   ]);
   const [messageInput, setMessageInput] = useState("");
-
   const [roomDetails, setRoomDetails] = useState(null);
-  const roomDetailsRef = useRef(roomDetails);
 
+  useEffect(() => {
+    // Setup message listener
+    const handleNewMessage = (message) => {
+      setMessages(prevMessages => [...prevMessages, message]);
+    };
+
+    roomService.listenForMessages(handleNewMessage);
+
+    // Setup room details listener
+    roomService.listenForRoomDetails((details) => {
+      setRoomDetails(details);
+    });
+
+    // Cleanup function to remove listeners when component unmounts
+    return () => {
+      roomService.unsubscribeFromMessages();
+      roomService.unsubscribeFromRoomDetails();
+    };
+  }, []);
 
   const handleMessageSend = () => {
-    if (messageInput) {
+    if (messageInput.trim()) {
       roomService.chatMessage(roomId, username, messageInput);
       setMessageInput("");
     }
-  }
+  };
 
-  
   return (
     <div>
       <div>
@@ -37,7 +53,9 @@ const ChatComponent = ({ roomId, username }) => {
           <div>
             <p>Room ID: {roomDetails.roomId}</p>
             <p>Users:</p>
-            <ul></ul>
+            <ul>
+              {roomDetails.users.map((user, index) => <li key={index}>{user.username}</li>)}
+            </ul>
           </div>
         ) : (
           <p>Loading room details...</p>

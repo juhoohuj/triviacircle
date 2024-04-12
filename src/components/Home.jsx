@@ -1,38 +1,39 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RoomView from "./RoomView";
-import socket from "../socket";
+import roomService from "../services/rooms";
 
 const Home = () => {
-  console.log("Home component rendering");
   const [roomCode, setRoomCode] = useState("");
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState(null);
   const navigateTo = useNavigate();
 
-  console.log("attempting to connect to server");
-
-  socket.on("connect", () => {
-    console.log(`Connected to server with socket ID: ${socket.id}`);
-  });
-
-  socket.on("connect_error", (err) => {
-    console.error("Connection Error:", err.message);
-  });
+  const handleJoinRoom = () => {
+    console.log("Joining room");
+    roomService.joinRoom(roomCode, username, {
+      onSuccess: (room) => {
+        setRoom(room);
+        navigateTo(`/room/${room.roomId}`);
+      },
+      onError: (error) => {
+        console.error("Error joining room:", error);
+        // Handle error (e.g., show message to user)
+      }
+    });
+  };
 
   const handleCreateRoom = () => {
-    // Emit event to create a room
-    socket.emit("createRoom", { username });
-
-    // Listen for a response from the server
-    socket.once("createRoomSuccess", (newRoom) => {
-      console.log(newRoom.id);
-      navigateTo(`/room/${newRoom.id}`);
-    });
-
-    // Optional: Listen for an error event
-    socket.once("createRoomError", (error) => {
-      console.log(error);
+    console.log("Creating room");
+    roomService.createRoom(username, {
+      onSuccess: (room) => {
+        setRoom(room);
+        navigateTo(`/room/${room.roomId}`);
+      },
+      onError: (error) => {
+        console.error("Error creating room:", error);
+        // Handle error (e.g., show message to user)
+      }
     });
   };
 
@@ -41,14 +42,14 @@ const Home = () => {
       {!room ? (
         <div>
           <h1>Welcome to the Home Page</h1>
-          <p>Enter your name: </p>
+          <p>Enter your name:</p>
           <input
             type="text"
             placeholder="Name..."
             onChange={(e) => setUsername(e.target.value)}
           />
 
-          <p>Join an existing game: </p>
+          <p>Join an existing game:</p>
           <input
             type="text"
             placeholder="Room Code..."
@@ -56,7 +57,7 @@ const Home = () => {
           />
           <button onClick={handleJoinRoom}>Join Game</button>
 
-          <p>Create a new game: </p>
+          <p>Create a new game:</p>
           <button onClick={handleCreateRoom}>Create Game</button>
         </div>
       ) : (
