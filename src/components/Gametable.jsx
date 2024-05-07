@@ -5,29 +5,12 @@ import { ButtonGroup } from "@mui/material";
 
 //pelipöytä
 const Gametable = () => {
-  const testUser = {
-    id: 1,
-    name: "Test User",
-    totalScore: 0,
-    roundScore: 0,
-    active: true,
-    answerQue: 1,
-  };
-
-  const testUser2 = {
-    id: 2,
-    name: "Test User 2",
-    totalScore: 4,
-    roundScore: 0,
-    active: false,
-    answerQue: 2,
-  };
 
   //make player object for the current player
 
 
 
-  const [players, setPlayers] = useState([testUser, testUser2]);
+  const [players, setPlayers] = useState([]);
   const [question, setQuestion] = useState(questions[0].question);
   const [correct, setCorrect] = useState(questions[0].correct);
   const [incorrect, setIncorrect] = useState(questions[0].incorrect);

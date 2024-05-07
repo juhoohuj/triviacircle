@@ -2,18 +2,19 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RoomView from "./RoomView";
 import roomService from "../services/rooms";
+import { useUser } from "../contexts/UserContext";
 
 const Home = () => {
   const [roomCode, setRoomCode] = useState("");
-  const [username, setUsername] = useState("");
-  const [room, setRoom] = useState(null);
+  
+  const { username, setUsername, room, setRoom } = useUser();
+
   const navigateTo = useNavigate();
 
   const handleJoinRoom = () => {
     console.log("Joining room");
     roomService.joinRoom(roomCode, username, {
       onSuccess: (room) => {
-        setRoom(room);
         navigateTo(`/room/${room.roomId}`);
       },
       onError: (error) => {
@@ -22,12 +23,11 @@ const Home = () => {
       }
     });
   };
-
+  
   const handleCreateRoom = () => {
     console.log("Creating room");
     roomService.createRoom(username, {
       onSuccess: (room) => {
-        setRoom(room);
         navigateTo(`/room/${room.roomId}`);
       },
       onError: (error) => {
@@ -36,6 +36,7 @@ const Home = () => {
       }
     });
   };
+  
 
   return (
     <div>
