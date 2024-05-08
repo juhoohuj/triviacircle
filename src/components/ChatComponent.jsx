@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import roomService from "../services/rooms";
+import { useUser } from "../contexts/UserContext";
 
-const ChatComponent = ({ roomId, username }) => {
+const ChatComponent = () => {
+  const { username, room } = useUser();
   const [messages, setMessages] = useState([
     { username: "Admin", text: "Welcome to the chat!" },
     { username: "Admin", text: "Please be respectful!" },
@@ -15,23 +17,25 @@ const ChatComponent = ({ roomId, username }) => {
       setMessages(prevMessages => [...prevMessages, message]);
     };
 
-    roomService.listenForMessages(handleNewMessage);
+    if (room && room.roomId) {
+      roomService.listenForMessages(handleNewMessage, room.roomId); // Ensure you are listening to the right roomId
 
-    // Setup room details listener
-    roomService.listenForRoomDetails((details) => {
-      setRoomDetails(details);
-    });
+      // Setup room details listener
+      roomService.listenForRoomDetails(room.roomId, (details) => {
+        setRoomDetails(details);
+      });
 
-    // Cleanup function to remove listeners when component unmounts
-    return () => {
-      roomService.unsubscribeFromMessages();
-      roomService.unsubscribeFromRoomDetails();
-    };
-  }, []);
+      // Cleanup function to remove listeners when component unmounts
+      return () => {
+        roomService.unsubscribeFromMessages(room.roomId);
+        roomService.unsubscribeFromRoomDetails(room.roomId);
+      };
+    }
+  }, [room]); // Depend on room to re-run these setups when it changes
 
   const handleMessageSend = () => {
-    if (messageInput.trim()) {
-      roomService.chatMessage(roomId, username, messageInput);
+    if (messageInput.trim() && room && room.roomId) {
+      roomService.chatMessage(room.roomId, username, messageInput);
       setMessageInput("");
     }
   };

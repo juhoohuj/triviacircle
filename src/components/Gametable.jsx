@@ -3,12 +3,7 @@ import Playerlist from "./Playerlist";
 import questions from "../../content/questions";
 import { ButtonGroup } from "@mui/material";
 
-//pelipöytä
 const Gametable = () => {
-
-  //make player object for the current player
-
-
 
   const [players, setPlayers] = useState([]);
   const [question, setQuestion] = useState(questions[0].question);

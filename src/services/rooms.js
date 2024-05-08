@@ -25,18 +25,19 @@ const leaveRoom = (roomId, username) => {
 const createRoom = (username, callbacks) => {
   socket.emit("createRoom", { username });
 
-  socket.on("createRoomSuccess", (room) => {
+  socket.on("roomCreated", (room) => {
     callbacks.onSuccess(room);
     socket.off("createRoomSuccess");
     socket.off("createRoomError");
   });
 
-  socket.on("createRoomError", (error) => {
+  socket.on("error", (error) => {
     callbacks.onError(error);
     socket.off("createRoomSuccess");
     socket.off("createRoomError");
   });
 };
+
 
 const chatMessage = (roomId, username, message) => {
   socket.emit("chatMessage", { roomId, username, message });

@@ -6,7 +6,6 @@ import { useUser } from "../contexts/UserContext";
 
 const Home = () => {
   const [roomCode, setRoomCode] = useState("");
-  
   const { username, setUsername, room, setRoom } = useUser();
 
   const navigateTo = useNavigate();
@@ -28,6 +27,8 @@ const Home = () => {
     console.log("Creating room");
     roomService.createRoom(username, {
       onSuccess: (room) => {
+        console.log("Room created:", room);
+        setRoom(room);
         navigateTo(`/room/${room.roomId}`);
       },
       onError: (error) => {
@@ -47,7 +48,10 @@ const Home = () => {
           <input
             type="text"
             placeholder="Name..."
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => {
+              setUsername(e.target.value);
+              console.log(username);
+            }}
           />
 
           <p>Join an existing game:</p>

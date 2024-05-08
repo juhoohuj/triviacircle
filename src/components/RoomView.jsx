@@ -7,44 +7,41 @@ import roomService from "../services/rooms";
 import { useParams } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 
-const RoomView = ({ }) => {
+const RoomView = () => {
   const navigateTo = useNavigate();
   const { roomId } = useParams();
-  const { username, setUsername, room, setRoom } = useUser();
-  console.log("Room ID:", room, "Username:", username);
+  const { username, room, setRoom } = useUser();
 
   useEffect(() => {
-    // Subscribe to room details
+    console.log("Room data at load:", room); // Initial log to check what the room object contains
+
     roomService.listenForRoomDetails((roomDetails) => {
       console.log("Room details updated", roomDetails);
-      // Here you would handle the incoming room details. For instance, you might want to update the state in a parent component or handle it in some other way.
+      setRoom(roomDetails); // Assuming setRoom is the correct method to update the room context
     });
 
-    // Return cleanup function
     return () => {
       roomService.unsubscribeFromRoomDetails();
     };
-  }, [roomId]); // This effect runs only when roomId changes
+  }, [roomId, setRoom]); // Ensure dependencies are correctly listed
 
-  // handle leaving the room
   const handleLeaveRoom = () => {
     roomService.leaveRoom(roomId, username);
     navigateTo("/");
   };
 
-  // Render the components only when roomId and room are valid
   return (
     <div>
       <h1>Room: {roomId || "Loading Room ID..."}</h1>
       <h2>Username: {username}</h2>
-      {roomId && (
+      {roomId && room && (
         <>
           <ChatComponent roomId={roomId} username={username} />
           <Gametable roomId={roomId} username={username} />
           <button onClick={handleLeaveRoom}>Leave Room</button>
         </>
       )}
-      {!roomId && <p>Waiting for room information...</p>}
+      {(!roomId || !room) && <p>Waiting for room information...</p>}
     </div>
   );
 };
