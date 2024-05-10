@@ -15,9 +15,10 @@ const Home = () => {
     roomService.joinRoom(roomCode, username, {
       onSuccess: (room) => {
         navigateTo(`/room/${room.roomId}`);
+        setRoom(room);
       },
       onError: (error) => {
-        console.error("Error joining room:", error);
+        console.error("Error joining room:", error);  
         // Handle error (e.g., show message to user)
       }
     });

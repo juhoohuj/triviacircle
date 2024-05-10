@@ -12,29 +12,28 @@ const ChatComponent = () => {
   const [roomDetails, setRoomDetails] = useState(null);
 
   useEffect(() => {
-    // Setup message listener
-    const handleNewMessage = (message) => {
-      setMessages(prevMessages => [...prevMessages, message]);
-    };
-
     if (room && room.roomId) {
-      roomService.listenForMessages(handleNewMessage, room.roomId); // Ensure you are listening to the right roomId
-
-      // Setup room details listener
-      roomService.listenForRoomDetails(room.roomId, (details) => {
+      const handleNewMessage = (message) => {
+        setMessages(prevMessages => [...prevMessages, message]);
+      };
+  
+      const handleRoomDetails = (details) => {
         setRoomDetails(details);
-      });
-
-      // Cleanup function to remove listeners when component unmounts
+      };
+  
+      // These should return functions for unsubscribing
+      const unsubscribeMessages = roomService.listenForMessages(handleNewMessage);
+      const unsubscribeDetails = roomService.listenForRoomDetails(handleRoomDetails);
+  
       return () => {
-        roomService.unsubscribeFromMessages(room.roomId);
-        roomService.unsubscribeFromRoomDetails(room.roomId);
+        unsubscribeMessages(); // Unsubscribe from message events
+        unsubscribeDetails();  // Unsubscribe from room details events
       };
     }
-  }, [room]); // Depend on room to re-run these setups when it changes
+  }, [room]);
 
   const handleMessageSend = () => {
-    if (messageInput.trim() && room && room.roomId) {
+    if (messageInput.trim()) {
       roomService.chatMessage(room.roomId, username, messageInput);
       setMessageInput("");
     }
@@ -42,15 +41,12 @@ const ChatComponent = () => {
 
   return (
     <div>
-      <div>
-        <h2>Chat</h2>
-        {messages.map((message, index) => (
-          <div key={index}>
-            <strong>{message.username}: </strong>
-            {message.text}
-          </div>
-        ))}
-      </div>
+      <h2>Chat</h2>
+      {messages.map((message, index) => (
+        <div key={index}>
+          <strong>{message.username}: </strong>{message.text}
+        </div>
+      ))}
       <div>
         <h2>Room Details</h2>
         {roomDetails ? (
@@ -58,7 +54,9 @@ const ChatComponent = () => {
             <p>Room ID: {roomDetails.roomId}</p>
             <p>Users:</p>
             <ul>
-              {roomDetails.users.map((user, index) => <li key={index}>{user.username}</li>)}
+              {roomDetails.users.map((user, index) => (
+                <li key={index}>{user.username}</li>
+              ))}
             </ul>
           </div>
         ) : (

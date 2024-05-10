@@ -1,62 +1,87 @@
 import socket from "../socket";
 
-const joinRoom = (roomId, username, callbacks) => {
+const ensureFunction = (callback) => {
+  return typeof callback === "function" ? callback : () => {};
+};
+
+const joinRoom = (roomId, username, callbacks = {}) => {
+  const { onSuccess = () => {}, onError = () => {} } = callbacks;
+
   socket.emit("joinRoom", { roomId, username });
 
-  socket.on("joinRoomSuccess", (room) => {
-    callbacks.onSuccess(room);
-    // Clean up listeners after successful operation
-    socket.off("joinRoomSuccess");
-    socket.off("joinRoomError");
-  });
+  const handleSuccess = (room) => {
+    if (typeof onSuccess === "function") {
+      onSuccess(room);
+    }
+    cleanup();
+  };
 
-  socket.on("joinRoomError", (error) => {
-    callbacks.onError(error);
-    // Clean up listeners after error
-    socket.off("joinRoomSuccess");
-    socket.off("joinRoomError");
-  });
+  const handleError = (error) => {
+    if (typeof onError === "function") {
+      onError(error);
+    }
+    cleanup();
+  };
+
+  const cleanup = () => {
+    socket.off("joinRoomSuccess", handleSuccess);
+    socket.off("joinRoomError", handleError);
+  };
+
+  socket.on("joinRoomSuccess", handleSuccess);
+  socket.on("joinRoomError", handleError);
+
+  return cleanup;
 };
 
 const leaveRoom = (roomId, username) => {
   socket.emit("leaveRoom", { roomId, username });
 };
 
-const createRoom = (username, callbacks) => {
+const createRoom = (username, callbacks = {}) => {
+  const { onSuccess = () => {}, onError = () => {} } = callbacks;
+
   socket.emit("createRoom", { username });
 
-  socket.on("roomCreated", (room) => {
-    callbacks.onSuccess(room);
-    socket.off("createRoomSuccess");
-    socket.off("createRoomError");
-  });
+  const handleSuccess = (room) => {
+    if (typeof onSuccess === "function") {
+      onSuccess(room);
+    }
+    cleanup();
+  };
 
-  socket.on("error", (error) => {
-    callbacks.onError(error);
-    socket.off("createRoomSuccess");
-    socket.off("createRoomError");
-  });
+  const handleError = (error) => {
+    if (typeof onError === "function") {
+      onError(error);
+    }
+    cleanup();
+  };
+
+  const cleanup = () => {
+    socket.off("roomCreated", handleSuccess);
+    socket.off("error", handleError);
+  };
+
+  socket.on("roomCreated", handleSuccess);
+  socket.on("error", handleError);
+
+  return cleanup;
 };
-
 
 const chatMessage = (roomId, username, message) => {
   socket.emit("chatMessage", { roomId, username, message });
 };
 
 const listenForMessages = (callback) => {
-  socket.on("message", callback);
-};
-
-const unsubscribeFromMessages = () => {
-  socket.off("message");
+  const safeCallback = ensureFunction(callback);
+  socket.on("message", safeCallback);
+  return () => socket.off("message", safeCallback);
 };
 
 const listenForRoomDetails = (callback) => {
-  socket.on("roomDetails", callback);
-};
-
-const unsubscribeFromRoomDetails = () => {
-  socket.off("roomDetails");
+  const safeCallback = ensureFunction(callback);
+  socket.on("roomDetails", safeCallback);
+  return () => socket.off("roomDetails", safeCallback);
 };
 
 const disconnectSocket = () => {
@@ -66,11 +91,9 @@ const disconnectSocket = () => {
 export default {
   joinRoom,
   leaveRoom,
+  createRoom,
   chatMessage,
   listenForMessages,
-  unsubscribeFromMessages,
-  disconnectSocket,
-  createRoom,
   listenForRoomDetails,
-  unsubscribeFromRoomDetails,
+  disconnectSocket
 };
