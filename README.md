@@ -1,5 +1,9 @@
-# Quiz game for mobile/desktop, inspired by Smart10, WIP
+# Quiz game for mobile/desktop, inspired by Smart10 board game, WIP
 
-React, Socket.io
+Stack:
+React, Socket.io, Node, Firebase
 
-All by me, solo bolo
+Party game where everyone answers questions based on the order of the players. Player either creates new room or joins an existing room (lobby system). Chatting included.
+Coming to web soon and planning to publish app version (Android / iOS) after that.
+
+Currently under development and not published anywhere
