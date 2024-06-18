@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 // Create the context
 const UserContext = createContext(null);
@@ -8,26 +8,20 @@ const useUser = () => useContext(UserContext);
 
 // Provider component that wraps your app and provides the context
 const UserProvider = ({ children }) => {
-  const [username, setUsername] = useState('');
-  const [room, setRoom] = useState(null);
-  const [roomDetails, setRoomDetails] = useState(null);
+	const [username, setUsername] = useState("");
+	const [room, setRoom] = useState(null);
+	const [roomDetails, setRoomDetails] = useState(null);
 
+	const value = {
+		username,
+		setUsername,
+		room,
+		setRoom,
+		roomDetails,
+		setRoomDetails,
+	};
 
-
-  const value = {
-    username,
-    setUsername,
-    room,
-    setRoom,
-    roomDetails,
-    setRoomDetails,
-  };
-
-  return (
-    <UserContext.Provider value={value}>
-      {children}
-    </UserContext.Provider>
-  );
+	return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
-  
+
 export { UserProvider, useUser };
