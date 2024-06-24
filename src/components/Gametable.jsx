@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Playerlist from "./Playerlist";
 import questions from "../../content/questions";
-import { ButtonGroup } from "@mui/material";
+import { ButtonGroup, Button } from '@mui/material';
 
 const Gametable = () => {
-	const [players, setPlayers] = useState([]);
+	const [players, setPlayers] = useState([
+		{ name: 'Player 1', active: true, roundScore: 0, answerQue: 1, answeredWrong: false },
+		{ name: 'Player 2', active: false, roundScore: 0, answerQue: 2, answeredWrong: false },
+		{ name: 'Player 3', active: false, roundScore: 0, answerQue: 3, answeredWrong: false },
+		{ name: 'Player 4', active: false, roundScore: 0, answerQue: 4, answeredWrong: false },
+	]);
 	const [question, setQuestion] = useState(questions[0].question);
 	const [correct, setCorrect] = useState(questions[0].correct);
 	const [incorrect, setIncorrect] = useState(questions[0].incorrect);
@@ -24,7 +29,7 @@ const Gametable = () => {
 	function checkAnswer(answer, index) {
 		let player = players.find((player) => player.active);
 		console.log("Player: ", player);
-		if (!disabledButtons.includes(index)) {
+		if (player && !disabledButtons.includes(index)) {
 			// Check if button is not disabled
 			if (correct.includes(answer)) {
 				console.log("Correct answer");
@@ -33,6 +38,7 @@ const Gametable = () => {
 				console.log("Wrong answer");
 				player.roundScore = 0;
 				player.answerQue = null;
+				player.answeredWrong = true;
 			}
 			setDisabledButtons([...disabledButtons, index]); // Disable the button
 			changeQue();
@@ -41,18 +47,34 @@ const Gametable = () => {
 
 	function changeQue() {
 		setPlayers((prevPlayers) => {
-			return prevPlayers.map((player) => {
-				const newPlayer = { ...player }; // Create a new player object to update
-				newPlayer.answerQue = player.answerQue - 1;
-				if (newPlayer.active) {
-					newPlayer.answerQue = players.length;
-					newPlayer.active = false;
+			let nextPlayers = prevPlayers.map((player) => {
+				if (player.answeredWrong) {
+					return { ...player, active: false, answerQue: null };
 				}
-				if (newPlayer.answerQue === 1) {
-					newPlayer.active = true;
-				}
-				return newPlayer;
+				return { ...player, answerQue: player.answerQue - 1 };
 			});
+
+			let activePlayerFound = false;
+
+			nextPlayers = nextPlayers.map((player, index) => {
+				if (!player.answeredWrong && player.answerQue === 1 && !activePlayerFound) {
+					activePlayerFound = true;
+					return { ...player, active: true, answerQue: nextPlayers.length };
+				} else if (player.answerQue < 1) {
+					return { ...player, answerQue: nextPlayers.length, active: false };
+				}
+				return { ...player, active: false };
+			});
+
+			if (!activePlayerFound) {
+				const firstActiveIndex = nextPlayers.findIndex((player) => !player.answeredWrong);
+				if (firstActiveIndex !== -1) {
+					nextPlayers[firstActiveIndex].active = true;
+					nextPlayers[firstActiveIndex].answerQue = nextPlayers.length;
+				}
+			}
+
+			return nextPlayers;
 		});
 	}
 
@@ -62,21 +84,34 @@ const Gametable = () => {
 		return shuffledAnswers;
 	};
 
+	const activePlayers = players.filter((player) => !player.answeredWrong);
+	const currentPlayer = players.find((player) => player.active);
+
 	return (
 		<div>
 			<h1>Game Table</h1>
 			<Playerlist players={players} />
 			<p>Question: {question}</p>
-			<p>Answers: </p>
+			<p>Active Players</p>
+			<ul>
+				{activePlayers.map((player) => (
+					<li key={player.name}>{player.name}</li>
+				))}
+			</ul>
+			{currentPlayer ? (
+				<p>Current Player: {currentPlayer.name}</p>
+			) : (
+				<p>No active player</p>
+			)}
 			<ul>
 				{shuffledAnswers.map((answer, index) => (
 					<ButtonGroup key={index} variant="contained" color="primary">
-						<button
+						<Button variant="contained" color="primary"
 							disabled={disabledButtons.includes(index)}
 							onClick={() => checkAnswer(answer, index)}
 						>
 							{answer}
-						</button>
+						</Button>
 					</ButtonGroup>
 				))}
 			</ul>
