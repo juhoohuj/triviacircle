@@ -16,6 +16,9 @@ const Gametable = () => {
 	const [disabledButtons, setDisabledButtons] = useState([]); // Track disabled buttons
 	const [shuffledAnswers, setShuffledAnswers] = useState([]); // Track shuffled answers
 
+	const [pastQuestions, setPastQuestions] = useState([]); // Track past questions
+
+
 	const addPlayer = (player) => {
 		setPlayers([...players, player]);
 	};
@@ -76,6 +79,25 @@ const Gametable = () => {
 
 			return nextPlayers;
 		});
+	}
+
+	//check if all players have answered wrong
+	const allPlayersAnsweredWrong = players.every((player) => player.answeredWrong);
+
+	if (allPlayersAnsweredWrong) {
+		nextQuestion();
+	}
+
+
+	// Function to get the next question
+
+	const nextQuestion = () => {
+		const nextQuestionIndex = Math.floor(Math.random() * questions.length);
+		setQuestion(questions[nextQuestionIndex].question);
+		setCorrect(questions[nextQuestionIndex].correct);
+		setIncorrect(questions[nextQuestionIndex].incorrect);
+		setDisabledButtons([]);
+		setShuffledAnswers(shuffleAnswers(questions[nextQuestionIndex].correct, questions[nextQuestionIndex].incorrect));
 	}
 
 	const shuffleAnswers = (correct, incorrect) => {
