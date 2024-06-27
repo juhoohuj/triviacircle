@@ -88,6 +88,33 @@ const disconnectSocket = () => {
 	socket.close();
 };
 
+const subscribeToRoom = (roomId, callbacks = {}) => {
+	const { onPlayersChange = () => {}, onGameStart = () => {} } = callbacks;
+
+	socket.emit("subscribeToRoom", roomId);
+
+	const handlePlayersChange = (players) => {
+		onPlayersChange(players);
+	};
+
+	const handleGameStart = () => {
+		onGameStart();
+	};
+
+	socket.on("playersChange", handlePlayersChange);
+	socket.on("gameStart", handleGameStart);
+
+	return () => {
+		socket.off("playersChange", handlePlayersChange);
+		socket.off("gameStart", handleGameStart);
+	};
+}
+
+const unsubscribeFromRoom = (roomId) => {
+	socket.emit("unsubscribeFromRoom", roomId);
+}
+
+
 export default {
 	joinRoom,
 	leaveRoom,
@@ -96,4 +123,6 @@ export default {
 	listenForMessages,
 	listenForRoomDetails,
 	disconnectSocket,
+	subscribeToRoom,
+	unsubscribeFromRoom,
 };

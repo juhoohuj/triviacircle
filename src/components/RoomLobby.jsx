@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import roomService from "../services/rooms";
 
 const RoomLobby = ({ room, username }) => {
-	const [players, setPlayers] = useState([]);
+	const [players, setPlayers] = useState([ 	]);
 
 	useEffect(() => {
 		// subscribe to the room
