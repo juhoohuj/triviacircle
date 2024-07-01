@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Playerlist from "./Playerlist";
 import questions from "../../content/questions";
 import { ButtonGroup, Button } from '@mui/material';
+import Dialog from "@mui/material/Dialog";
 
 const Gametable = () => {
 	const [players, setPlayers] = useState([
@@ -17,6 +18,30 @@ const Gametable = () => {
 	const [shuffledAnswers, setShuffledAnswers] = useState([]); // Track shuffled answers
 
 	const [pastQuestions, setPastQuestions] = useState([]); // Track past questions
+
+	// dialogscreen to confirm the answer
+	
+	const DialogScreen = () => {
+		const [open, setOpen] = React.useState(false);
+		const handleClickOpen = () => {
+			setOpen(true);
+		};
+		const handleClose = () => {
+			setOpen(false);
+		};
+		return (
+			<div>
+				<Button variant="contained" color="primary" onClick={handleClickOpen}>
+					Open dialog
+				</Button>
+				<Dialog open={open} onClose={handleClose}>
+					<p>Are you sure you want to submit this answer?</p>
+					<Button onClick={handleClose}>No</Button>
+					<Button onClick={handleClose}>Yes</Button>
+				</Dialog>
+			</div>
+		);
+	}
 
 
 	const addPlayer = (player) => {
@@ -111,6 +136,7 @@ const Gametable = () => {
 
 	return (
 		<div>
+			<DialogScreen />
 			<h1>Game Table</h1>
 			<Playerlist players={players} />
 			<p>Question: {question}</p>
