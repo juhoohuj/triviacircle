@@ -4,6 +4,7 @@ import { UserProvider } from "./contexts/UserContext";
 import Home from "./components/Home";
 import RoomView from "./components/RoomView";
 import "./App.css";
+import Gametable from "./components/Gametable";
 
 const App = () => {
 	return (
@@ -11,7 +12,7 @@ const App = () => {
 			<UserProvider>
 				<Router>
 					<Routes>
-						<Route path="/" element={<Home />} />
+						<Route path="/" element={<Gametable />} />
 						<Route path="/room/:roomId" element={<RoomView />} />
 					</Routes>
 				</Router>
